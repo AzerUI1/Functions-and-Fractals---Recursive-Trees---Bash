@@ -1,0 +1,16 @@
+# Vim / Nano backup files
+*~
+*.swp
+*.swo
+
+# macOS Finder junk
+.DS_Store
+
+# Logs
+*.log
+
+# ShellCheck cache (if you use it)
+.shellcheck/
+
+# Temporary files
+tmp/
