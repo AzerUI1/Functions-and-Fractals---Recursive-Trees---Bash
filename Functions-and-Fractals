@@ -1,0 +1,121 @@
+#!/bin/bash
+
+draw_blank_lines () {
+    for i in $(seq $1); do
+       printf %"100"s | tr " " "_" | sed 's/$/\n/'
+    done
+}
+
+# to get the "right" answer we have to add 18 "_" to the left side
+# and 19 "_" to the right side since we use a 63-column box in our calculations
+# instead of a 100-column box in order to properly draw all the trees together
+fix_width () {
+    sed 's/^/__________________/' | sed 's/$/___________________/'
+}
+
+# Natural Natural
+# takes two numbers that represent a number of "_" before "1"
+# and after "1" accordingly and draws a line
+draw_line () {
+    printf %"$1"s | tr " " "_"
+    printf "1"
+    printf %"$2"s | tr " " "_"
+}
+
+# Width Height
+# Natural Natural
+#_____1_______1_____
+#______1_____1______
+#_______1___1_______
+#________1_1________
+#_>_______1_________
+#_>_______1_________
+#_>_______1_________
+#_>_______1_________
+draw_stalk () {
+    let before=$1/2
+    let after=$1/2
+
+    for i in $(seq $2); do
+        draw_line $before $after
+        printf "\n"
+    done
+}
+
+# Width Height
+# Natural Natural
+#_>___1_______1_____
+#_>____1_____1______
+#_>_____1___1_______
+#_>______1_1________
+#_________1_________
+#_________1_________
+#_________1_________
+#_________1_________
+draw_fork () {
+    let left_a=0
+    let right_b=0
+    let left_b=($1/2)-1
+    let right_a=($1/2)-1
+
+    for i in $(seq $2); do
+      draw_line $left_b $left_a; printf "_"
+      draw_line $right_b $right_a; printf "\n"
+
+      # we're moving "1"s for both branches with every itteration
+      # making the distance between them wider and wider
+      let left_b=$left_b-1; let left_a=$left_a+1
+      let right_b=$right_b+1; let right_a=$right_a-1
+    done
+    
+}
+
+draw_tree () {
+    let width=$1
+    let height=$2
+    
+    draw_stalk $width $height
+    draw_fork $width $height
+}
+
+# Natural Natural Natural -> String
+# Width   Height  n_trees 
+# composes a string with calls to draw_tree, so that 
+# we could eval it later
+# result="<(draw_tree 7 2) <(draw_tree 7 2) <(draw_tree 7 2)"
+next_trees () {
+    result=""
+    for i in $(seq $3); do
+        # if we add anything to an empty var ""
+        # there is no space after the first argument
+        result="<(draw_tree $1 $2) $result"
+    done
+
+    echo $result
+}
+
+main () {
+    # n =< 5
+    read -p "n<=5: " n
+    # width and height of the very first tree
+    width=63
+    height=16
+    lines=63
+    trees=1
+    steps=0
+    
+    for i in $(seq $n); do
+        # tr '\t' '0' 
+        # replace "\t" between trees with "_"
+        eval paste $(next_trees $width $height $trees) | tr '\t' '_' | fix_width
+        # at each step we reduce the number of blank lines by the height of the tree
+        let lines=$((lines - (height * 2)))
+        let width=$width/2
+        let height=$height/2
+        let trees=$trees*2
+    done
+
+    draw_blank_lines $lines
+}
+
+main | tac
