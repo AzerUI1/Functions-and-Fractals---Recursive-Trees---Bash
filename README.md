@@ -1,5 +1,3 @@
-```markdown
-
 <h1 align="center"> Functions & Fractals — Recursive Trees (Bash)</h1>
 
 <p align="center">
@@ -124,7 +122,6 @@ If you like this fractal project, please **star the repo**
     <img src="https://img.shields.io/badge/GitHub-AzerU11-000000?style=for-the-badge&logo=github" />
   </a>
 </p>
-```
 
 ---
 
